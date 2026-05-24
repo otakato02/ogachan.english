@@ -21,7 +21,7 @@
         .back-btn { align-self: flex-start; background: transparent; border: 2px solid #cbd5e1; border-radius: 8px; color: var(--primary); font-size: 0.9rem; font-weight: bold; cursor: pointer; padding: 6px 12px; margin-bottom: 10px; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
         .back-btn:hover { background: #e2e8f0; border-color: #94a3b8; }
 
-        /* セレクター（グリッドレスポンシブ対応） */
+        /* セレクター */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; width: 100%; padding: 10px 0; }
         .card { background: white; border: 3px solid #ddd; border-radius: 15px; padding: 18px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .card:hover { transform: scale(1.03); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -34,11 +34,10 @@
         .gto-msg { background: #e8eaf6; color: var(--primary); align-self: flex-start; }
         .user-msg { background: var(--primary); color: white; align-self: flex-end; }
 
-        /* 翻訳ギミック */
-        .translate-btn { background: white; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 8px; color: #475569; display: block; transition: 0.2s; }
-        .translate-btn:hover { background: #f8fafc; border-color: #94a3b8; }
-        .ja-text { display: none; color: #475569; margin-top: 8px; font-size: 0.95rem; border-top: 1px dashed #cbd5e1; padding-top: 8px; }
-
+        /* 3段階表示ギミック用のボタン */
+        .toggle-btn { background: white; border: 2px solid #cbd5e1; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; color: var(--primary); transition: 0.2s; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .toggle-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+        
         /* ミッションパネル */
         .mission-panel { width: 100%; display: flex; justify-content: space-around; margin-bottom: 10px; background: #fff; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .mission-item { color: #ccc; }
@@ -104,15 +103,17 @@
 </div>
 
 <script>
-    const keyPart1 = "AIzaSyCKfsgCsCZGW";
-const keyPart2 = "tRxe13p4nlmnfc82_VDE2Y";
-const API_KEY = keyPart1 + keyPart2;
+    // ★ ここをご自身の「分割したキー」に書き換えてください！
+     const keyPart1 = "AIzaSyCKfsgCsCZGW";
+　const keyPart2 = "tRxe13p4nlmnfc82_VDE2Y";
+　const API_KEY = keyPart1 + keyPart2;
+
     let grade = 1;
     let lesson = '';
     let level = 'Normal';
     let isListening = false;
 
-    // ★ NEW CROWN 1年〜3年 全カリキュラムデータ
+    // ★ NEW CROWN 1年〜3年 全カリキュラムデータ（不足分を最後まで補完しました！）
     const newCrownData = {
         1: [
             { lesson: "Lesson 1", title: "About Me", grammar: "be動詞と一般動詞の現在形(1・2人称)、What do you...?" },
@@ -120,7 +121,9 @@ const API_KEY = keyPart1 + keyPart2;
             { lesson: "Lesson 3", title: "My Treasure", grammar: "be動詞(3人称)、What is this?、Who is...?、人称代名詞目的格" },
             { lesson: "Lesson 4", title: "My Summer Plans", grammar: "過去の表現(I went to...)、I want to..." },
             { lesson: "Lesson 5", title: "Ms. Brown's Family", grammar: "3人称単数現在形の肯定・疑問・否定文" },
-            { lesson: "Lesson 6", title: "School Life in Canada", grammar: "現在進行形(肯定・疑問・否定文)、Which... A or B?" }
+            { lesson: "Lesson 6", title: "School Life in Canada", grammar: "現在進行形(肯定・疑問・否定文)、Which... A or B?" },
+            { lesson: "Lesson 7", title: "A Junior High School in New Zealand", grammar: "過去の表現(規則・不規則動詞)、There is/are" },
+            { lesson: "Lesson 8", title: "A Surprise Party", grammar: "過去進行形、感嘆文(What/How)" }
         ],
         2: [
             { lesson: "Lesson 1", title: "Coming to Japan", grammar: "過去進行形、未来の表現(will, be going to)" },
@@ -136,20 +139,17 @@ const API_KEY = keyPart1 + keyPart2;
             { lesson: "Lesson 2", title: "An Indian Movie", grammar: "後置修飾(現在分詞・過去分詞)、〈be glad to ...〉" },
             { lesson: "Lesson 3", title: "Animals on the Move", grammar: "関係代名詞(who, which, that の主格・目的格)" },
             { lesson: "Lesson 4", title: "A Video Message", grammar: "間接疑問文〈SVOO〉、tell + A + 疑問詞" },
-            { lesson: "Lesson 5", title: "A Graduation Speech", grammar: "仮定法過去(If I were..., I would...)" }
+            { lesson: "Lesson 5", title: "A Graduation Speech", grammar: "仮定法過去(If I were..., I would...)" },
+            { lesson: "Lesson 6", title: "The Legacy of Anne Frank", grammar: "関係代名詞(非制限用法)、接触節" }
         ]
     };
 
     // 戻るボタンの処理
     function goBack(currentScreenId, prevScreenId) {
-        // AIが喋っていたらピタッと止める
         window.speechSynthesis.cancel();
-        
-        // 画面を切り替える
         document.getElementById(currentScreenId).classList.remove('active');
         document.getElementById(prevScreenId).classList.add('active');
 
-        // チャット画面から戻る場合は、チャット履歴を綺麗にリセットする
         if (currentScreenId === 'screen-chat') {
             document.getElementById('chat-window').innerHTML = '';
             document.getElementById('m1').className = 'mission-item';
@@ -160,17 +160,13 @@ const API_KEY = keyPart1 + keyPart2;
     // 画面遷移・選択ロジック
     function selectGrade(g) { 
         grade = g; 
-        
-        // 選択された学年に応じてレッスンボタンを動的生成
         const lessonGrid = document.getElementById('lesson-grid');
         lessonGrid.innerHTML = ''; 
         
         newCrownData[grade].forEach(item => {
             const card = document.createElement('div');
             card.className = 'card';
-            // AIへの指示用にレッスン情報と文法を合体
             const aiInstruction = `${item.lesson}: ${item.title} (${item.grammar})`;
-            
             card.onclick = () => selectLesson(aiInstruction);
             card.innerHTML = `<h2>${item.lesson}</h2><p><strong>${item.title}</strong><br><small style="color:#64748b; font-size:11px;">${item.grammar}</small></p>`;
             lessonGrid.appendChild(card);
@@ -195,11 +191,11 @@ const API_KEY = keyPart1 + keyPart2;
 
     function setupApp() {
         const badge = document.getElementById('grade-badge');
-        const lessonShort = lesson.split('(')[0].trim(); // 表示用にすっきりさせる
+        const lessonShort = lesson.split('(')[0].trim(); 
         badge.textContent = `JHS ${grade} - ${lessonShort} - ${level} Mode`;
         badge.style.backgroundColor = `var(--${level.toLowerCase()})`;
         
-        // 初回メッセージ（オガちゃんとして挨拶）
+        // 初回メッセージも3段階表示ギミックに合わせる
         const introText = `Hi! I'm Oga-chan. Let's practice English using ${lessonShort}! Ready?|こんにちは！オガちゃんです。${lessonShort}を使って英語の練習をしよう！準備はいい？`;
         processGtoMsg(introText);
     }
@@ -220,7 +216,7 @@ const API_KEY = keyPart1 + keyPart2;
         win.scrollTop = win.scrollHeight;
     }
 
-    // AIの返答を解析して翻訳ボタン付きで画面追加
+    // ★ AIの返答を「音声のみ → 英文 → 日本語」の3段階で表示するギミック
     function processGtoMsg(text) {
         const parts = text.split('|');
         const enText = parts[0] ? parts[0].trim() : "Sorry, I couldn't understand.";
@@ -229,25 +225,32 @@ const API_KEY = keyPart1 + keyPart2;
         const div = document.createElement('div');
         div.className = `msg gto-msg`;
         
-        // 構造：英語文 + 翻訳ボタン + 初期状態は非表示の日本語訳
+        // 1. 最初は「👀 英文を見る」ボタンだけ表示
+        // 2. 押すと英文と「🇯🇵 翻訳を見る」ボタンが出現
+        // 3. さらに押すと日本語訳が出現
         div.innerHTML = `
-            <div class="en-text">${enText}</div>
-            <button class="translate-btn" onclick="this.nextElementSibling.style.display='block'; this.style.display='none';">🇯🇵 翻訳を見る</button>
-            <div class="ja-text">${jaText}</div>
+            <button class="toggle-btn" onclick="this.style.display='none'; this.nextElementSibling.style.display='block'; this.nextElementSibling.nextElementSibling.style.display='flex';">
+                👀 英文を見る
+            </button>
+            <div class="en-text" style="display:none; font-size:1.1rem; margin-bottom:10px;">${enText}</div>
+            
+            <button class="toggle-btn" style="display:none; font-size:0.8rem; padding:4px 10px;" onclick="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                🇯🇵 日本語訳を見る
+            </button>
+            <div class="ja-text" style="display:none; color:#475569; font-size:0.95rem; border-top:1px dashed #cbd5e1; padding-top:8px;">${jaText}</div>
         `;
 
         const win = document.getElementById('chat-window');
         win.appendChild(div);
         win.scrollTop = win.scrollHeight;
 
-        // 音声は英語のみを読み上げる
+        // 音声はすぐに読み上げる
         speak(enText);
     }
 
     function speak(text) {
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = 'en-US';
-        // 難易度によるスピード調整
         utter.rate = (level === 'Easy') ? 0.75 : (level === 'Hard') ? 1.0 : 0.9;
         window.speechSynthesis.speak(utter);
     }
@@ -277,9 +280,8 @@ const API_KEY = keyPart1 + keyPart2;
         sendToGemini(text);
     };
 
-    // Gemini API 連携（厳格な文字数・フォーマット制限）
+    // Gemini API 連携
     async function sendToGemini(userText) {
-        // ミッションチェック
         if(userText.toLowerCase().includes("i think")) document.getElementById('m1').className = 'mission-item done';
         if(userText.toLowerCase().includes("because")) document.getElementById('m2').className = 'mission-item done';
 
@@ -296,7 +298,6 @@ const API_KEY = keyPart1 + keyPart2;
             1. Restrict your grammar and vocabulary strictly to what is learned up to this point in the "NEW CROWN" textbook for Grade ${grade}. Do not use unlearned advanced grammar.
             2. Keep your English response extremely short (1 to 2 simple sentences MAXIMUM). Never output long sentences or paragraphs.
             3. Format your response STRICTLY as "English text|Japanese translation". Do not include any other text, markdown, or extra symbols.
-               Example: "Great job! What do you like?|よくできました！何が好きですか？"
             4. ${level === 'Easy' ? "Use very simple words. Provide hints like 'You can say: I think...'" : level === 'Hard' ? "Use natural speed. Ask 'Why?' or 'How?' to challenge the student." : "Speak politely and clearly."}
             
             Student said: "${userText}"
@@ -312,7 +313,6 @@ const API_KEY = keyPart1 + keyPart2;
             const data = await response.json();
 
             if (!response.ok) {
-                console.error("API Error Details:", data);
                 processGtoMsg(`通信エラーが発生しました。|API Error: ${data.error?.message || 'Check your key or connection.'}`);
                 document.getElementById('status-text').textContent = "Hold to speak";
                 return;
