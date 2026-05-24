@@ -2,43 +2,49 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>GTO AI English Coach - 3x3 Matrix</title>
+    <title>GTO AI English Coach - New Crown Full Version</title>
     <style>
         :root { --primary: #002147; --accent: #ffd700; --easy: #4caf50; --normal: #2196f3; --hard: #f44336; }
         body { font-family: 'Segoe UI', 'Noto Sans JP', sans-serif; background: #f1f5f9; margin: 0; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
         
         /* 画面切り替え管理 */
-        .screen { display: none; width: 100%; max-width: 800px; flex-direction: column; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.5s; }
+        .screen { display: none; width: 100%; max-width: 800px; flex-direction: column; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.5s; box-sizing: border-box; max-height: 100vh; overflow-y: auto; }
         .screen.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        h1 { color: var(--primary); font-size: 2.5rem; text-align: center; }
-        .desc { color: #64748b; margin-bottom: 30px; text-align: center; }
+        h1 { color: var(--primary); font-size: 2.3rem; text-align: center; margin-bottom: 5px; }
+        .desc { color: #64748b; margin-bottom: 25px; text-align: center; }
 
-        /* セレクター（学年・難易度共通） */
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; }
-        .card { background: white; border: 3px solid #ddd; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .card:hover { transform: scale(1.05); border-color: var(--primary); }
-        .card h2 { margin: 0; font-size: 1.5rem; }
+        /* セレクター（グリッドレスポンシブ対応） */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; width: 100%; padding: 10px 0; }
+        .card { background: white; border: 3px solid #ddd; border-radius: 15px; padding: 18px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card:hover { transform: scale(1.03); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card h2 { margin: 0; font-size: 1.3rem; color: var(--primary); }
+        .card p { margin: 8px 0 0 0; font-size: 0.9rem; color: #475569; line-height: 1.3; }
 
         /* チャット画面 */
-        #chat-window { flex: 1; width: 100%; background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 1.1rem; line-height: 1.4; }
+        #chat-window { flex: 1; width: 100%; background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; }
+        .msg { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 1.1rem; line-height: 1.4; box-sizing: border-box; }
         .gto-msg { background: #e8eaf6; color: var(--primary); align-self: flex-start; }
         .user-msg { background: var(--primary); color: white; align-self: flex-end; }
 
+        /* 翻訳ギミック */
+        .translate-btn { background: white; border: 1px solid #cbd5e1; padding: 4px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 8px; color: #475569; display: block; transition: 0.2s; }
+        .translate-btn:hover { background: #f8fafc; border-color: #94a3b8; }
+        .ja-text { display: none; color: #475569; margin-top: 8px; font-size: 0.95rem; border-top: 1px dashed #cbd5e1; padding-top: 8px; }
+
         /* ミッションパネル */
-        .mission-panel { width: 100%; display: flex; justify-content: space-around; margin-bottom: 10px; background: #fff; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; }
+        .mission-panel { width: 100%; display: flex; justify-content: space-around; margin-bottom: 10px; background: #fff; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .mission-item { color: #ccc; }
         .mission-item.done { color: var(--easy); }
 
         /* 操作パネル */
-        .controls { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 20px 0; background: white; border-radius: 20px 20px 0 0; }
-        #talk-btn { width: 100px; height: 100px; border-radius: 50%; border: 6px solid #ddd; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.2s; user-select: none; }
+        .controls { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 15px 0; background: white; border-radius: 20px 20px 0 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+        #talk-btn { width: 90px; height: 90px; border-radius: 50%; border: 6px solid #ddd; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.2s; user-select: none; }
         #talk-btn.active { background: var(--hard); color: white; border-color: #ff8a80; transform: scale(0.95); box-shadow: 0 0 20px rgba(244,67,54,0.4); }
         #status-text { margin-top: 10px; font-weight: bold; color: var(--primary); }
 
-        .difficulty-indicator { padding: 5px 15px; border-radius: 20px; color: white; font-size: 0.8rem; margin-bottom: 10px; }
+        .difficulty-indicator { padding: 5px 15px; border-radius: 20px; color: white; font-size: 0.8rem; margin-bottom: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -47,10 +53,16 @@
     <h1>Grade Select</h1>
     <p class="desc">学年を選んでください (Select your grade)</p>
     <div class="grid">
-        <div class="card" onclick="selectGrade(1)"><h2>JHS 1</h2><p>基礎</p></div>
-        <div class="card" onclick="selectGrade(2)"><h2>JHS 2</h2><p>表現・理由</p></div>
-        <div class="card" onclick="selectGrade(3)"><h2>JHS 3</h2><p>実践・流暢性</p></div>
+        <div class="card" onclick="selectGrade(1)"><h2>JHS 1</h2><p>中学1年<br>基礎・基本</p></div>
+        <div class="card" onclick="selectGrade(2)"><h2>JHS 2</h2><p>中学2年<br>表現・理由</p></div>
+        <div class="card" onclick="selectGrade(3)"><h2>JHS 3</h2><p>中学3年<br>実践・流暢性</p></div>
     </div>
+</div>
+
+<div class="screen" id="screen-lesson">
+    <h1>Lesson Select</h1>
+    <p class="desc">学習する範囲を選んでください (Select your lesson)</p>
+    <div class="grid" id="lesson-grid"></div>
 </div>
 
 <div class="screen" id="screen-level">
@@ -58,7 +70,7 @@
     <p class="desc">難易度を選んでください (Select difficulty)</p>
     <div class="grid">
         <div class="card" onclick="selectLevel('Easy')" style="border-color: var(--easy)"><h2>Easy</h2><p>ゆっくり・ヒントあり</p></div>
-        <div class="card" onclick="selectLevel('Normal')" style="border-color: var(--normal)"><h2>Normal</h2><p>ふつう</p></div>
+        <div class="card" onclick="selectLevel('Normal')" style="border-color: var(--normal)"><h2>Normal</h2><p>ふつうのスピード</p></div>
         <div class="card" onclick="selectLevel('Hard')" style="border-color: var(--hard)"><h2>Hard</h2><p>速い・深掘り質問</p></div>
     </div>
 </div>
@@ -79,13 +91,64 @@
 <script>
     const API_KEY = 'AIzaSyBgPIeb4Yb1vdd5tig2zJG5v39qd6EJggA';
     let grade = 1;
+    let lesson = '';
     let level = 'Normal';
     let isListening = false;
 
-    // 学年・レベル選択
+    // ★ NEW CROWN 1年〜3年 全カリキュラムデータ（添付資料より完全抽出）
+    const newCrownData = {
+        1: [
+            { lesson: "Lesson 1", title: "About Me", grammar: "be動詞と一般動詞の現在形(1・2人称)、What do you...?" },
+            { lesson: "Lesson 2", title: "My Hero", grammar: "助動詞canの肯定・疑問・否定文" },
+            { lesson: "Lesson 3", title: "My Treasure", grammar: "be動詞(3人称)、What is this?、Who is...?、人称代名詞目的格" },
+            { lesson: "Lesson 4", title: "My Summer Plans", grammar: "過去の表現(I went to...)、I want to..." },
+            { lesson: "Lesson 5", title: "Ms. Brown's Family", grammar: "3人称単数現在形の肯定・疑問・否定文" },
+            { lesson: "Lesson 6", title: "School Life in Canada", grammar: "現在進行形(肯定・疑問・否定文)、Which... A or B?" }
+        ],
+        2: [
+            { lesson: "Lesson 1", title: "Coming to Japan", grammar: "過去進行形、未来の表現(will, be going to)" },
+            { lesson: "Lesson 2", title: "Fun with Books", grammar: "接続詞 when, if, because, that" },
+            { lesson: "Lesson 3", title: "My Workplace Experience", grammar: "to不定詞(副詞・形容詞・名詞用法)" },
+            { lesson: "Lesson 4", title: "Rules and Manners", grammar: "助動詞 must, must not, have to, should" },
+            { lesson: "Lesson 5", title: "Universal Design", grammar: "動名詞(~ing)" },
+            { lesson: "Lesson 6", title: "A Trip to the UK", grammar: "比較級・最上級(more, most)、同等比較(as...as)" },
+            { lesson: "Lesson 7", title: "The Story of Rakugo", grammar: "現在完了形(継続・経験・完了用法)" }
+        ],
+        3: [
+            { lesson: "Lesson 1", title: "My Dream", grammar: "現在完了進行形、文構造〈help＋A＋動詞の原形〉" },
+            { lesson: "Lesson 2", title: "An Indian Movie", grammar: "後置修飾(現在分詞・過去分詞)、〈be glad to ...〉" },
+            { lesson: "Lesson 3", title: "Animals on the Move", grammar: "関係代名詞(who, which, that の主格・目的格)" },
+            { lesson: "Lesson 4", title: "A Video Message", grammar: "間接疑問文〈SVOO〉、tell + A + 疑問詞" },
+            { lesson: "Lesson 5", title: "A Graduation Speech", grammar: "仮定法過去(If I were..., I would...)" }
+        ]
+    };
+
+    // 画面遷移・選択ロジック
     function selectGrade(g) { 
         grade = g; 
+        
+        // 選択された学年に応じてレッスンボタンを動的生成
+        const lessonGrid = document.getElementById('lesson-grid');
+        lessonGrid.innerHTML = ''; 
+        
+        newCrownData[grade].forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            // AIへの指示用にレッスン情報と文法を合体
+            const aiInstruction = `${item.lesson}: ${item.title} (${item.grammar})`;
+            
+            card.onclick = () => selectLesson(aiInstruction);
+            card.innerHTML = `<h2>${item.lesson}</h2><p><strong>${item.title}</strong><br><small style="color:#64748b; font-size:11px;">${item.grammar}</small></p>`;
+            lessonGrid.appendChild(card);
+        });
+
         document.getElementById('screen-grade').classList.remove('active');
+        document.getElementById('screen-lesson').classList.add('active');
+    }
+
+    function selectLesson(l) { 
+        lesson = l; 
+        document.getElementById('screen-lesson').classList.remove('active');
         document.getElementById('screen-level').classList.add('active');
     }
 
@@ -98,27 +161,53 @@
 
     function setupApp() {
         const badge = document.getElementById('grade-badge');
-        badge.textContent = `Grade ${grade} - ${level} Mode`;
+        const lessonShort = lesson.split('(')[0].trim(); // 表示用にすっきりさせる
+        badge.textContent = `JHS ${grade} - ${lessonShort} - ${level} Mode`;
         badge.style.backgroundColor = `var(--${level.toLowerCase()})`;
         
-        const intro = `Hi! I'm GTO, your Grade ${grade} English coach. This is ${level} mode. Let's talk about your favorite thing! Ready?`;
-        addMsg(intro, 'gto');
-        speak(intro);
+        // 初回メッセージも英語と日本語を「|」で区切って設定
+        const introText = `Hi! I'm GTO, your English coach. Let's talk using ${lessonShort}! Ready?|こんにちは！GTOです。${lessonShort}の内容を使ってお話ししましょう！準備はいいですか？`;
+        processGtoMsg(introText);
     }
 
-    // 音声認識・合成
+    // 音声認識・合成の設定
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = false;
 
-    function addMsg(text, sender) {
+    // ユーザー発話をチャット画面に追加
+    function addUserMsg(text) {
         const div = document.createElement('div');
-        div.className = `msg ${sender}-msg`;
-        div.innerHTML = text;
+        div.className = `msg user-msg`;
+        div.textContent = text;
         const win = document.getElementById('chat-window');
         win.appendChild(div);
         win.scrollTop = win.scrollHeight;
+    }
+
+    // AIの返答を解析して翻訳ボタン付きで画面追加
+    function processGtoMsg(text) {
+        const parts = text.split('|');
+        const enText = parts[0] ? parts[0].trim() : "Sorry, I couldn't understand.";
+        const jaText = parts[1] ? parts[1].trim() : "翻訳データがありません。";
+
+        const div = document.createElement('div');
+        div.className = `msg gto-msg`;
+        
+        // 構造：英語文 + 翻訳ボタン + 初期状態は非表示の日本語訳
+        div.innerHTML = `
+            <div class="en-text">${enText}</div>
+            <button class="translate-btn" onclick="this.nextElementSibling.style.display='block'; this.style.display='none';">🇯🇵 翻訳を見る</button>
+            <div class="ja-text">${jaText}</div>
+        `;
+
+        const win = document.getElementById('chat-window');
+        win.appendChild(div);
+        win.scrollTop = win.scrollHeight;
+
+        // 音声は英語のみを読み上げる
+        speak(enText);
     }
 
     function speak(text) {
@@ -129,7 +218,7 @@
         window.speechSynthesis.speak(utter);
     }
 
-    // PUSH TO TALK
+    // PUSH TO TALK ボタン制御
     const btn = document.getElementById('talk-btn');
     btn.onmousedown = () => {
         window.speechSynthesis.cancel();
@@ -150,60 +239,14 @@
 
     recognition.onresult = (event) => {
         const text = event.results[0][0].transcript;
-        addMsg(text, 'user');
+        addUserMsg(text);
         sendToGemini(text);
     };
 
-    // Gemini API 連携 (3x3 ロジック)
+    // Gemini API 連携（厳格な文字数・フォーマット制限）
     async function sendToGemini(userText) {
         // ミッションチェック
         if(userText.toLowerCase().includes("i think")) document.getElementById('m1').className = 'mission-item done';
         if(userText.toLowerCase().includes("because")) document.getElementById('m2').className = 'mission-item done';
 
-      const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
-        
-        // 学年とレベルに応じたシステムプロンプトの構築
-        const systemPrompt = `
-            You are GTO, a friendly English teacher.
-            User is a Junior High School Grade ${grade} student.
-            Current Difficulty Level: ${level}.
-            
-            Instructions:
-            - If Level is Easy: Use very simple words, speak slowly, and if the student is stuck, provide a hint like "You can say: I think soccer is...".
-            - If Level is Hard: Use natural speed, ask "Why?" and "How?" to challenge the student, and use slightly more advanced vocabulary.
-            - Focus on the mission: Use "I think" and "because".
-            - Student said: "${userText}"
-        `;
-
-        try {
-            const response = await fetch(url, { 
-                method: 'POST', 
-                headers: {
-                    'Content-Type': 'application/json' // ←★ここが重要です！
-                },
-                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] }) 
-            });
-            
-            const data = await response.json();
-
-            // API側からエラーが返ってきた場合の処理
-            if (!response.ok) {
-                console.error("API Error Details:", data); // F12キーの開発者ツールで詳細を確認できます
-                addMsg(`通信エラー: ${data.error?.message || '許可されていないURLか、キーが間違っています。'}`, 'gto');
-                document.getElementById('status-text').textContent = "Hold to speak";
-                return;
-            }
-
-            const aiText = data.candidates[0].content.parts[0].text;
-            addMsg(aiText, 'gto');
-            speak(aiText);
-            document.getElementById('status-text').textContent = "Hold to speak";
-        } catch (e) {
-            console.error(e);
-            addMsg("API Error. Check your key!", 'gto');
-            document.getElementById('status-text').textContent = "Hold to speak";
-        }
-    }
-</script>
-</body>
-</html>
+        const url = `
