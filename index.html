@@ -176,14 +176,32 @@
         `;
 
         try {
-            const response = await fetch(url, { method: 'POST', body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] }) });
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json' // ←★ここが重要です！
+                },
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] }) 
+            });
+            
             const data = await response.json();
+
+            // API側からエラーが返ってきた場合の処理
+            if (!response.ok) {
+                console.error("API Error Details:", data); // F12キーの開発者ツールで詳細を確認できます
+                addMsg(`通信エラー: ${data.error?.message || '許可されていないURLか、キーが間違っています。'}`, 'gto');
+                document.getElementById('status-text').textContent = "Hold to speak";
+                return;
+            }
+
             const aiText = data.candidates[0].content.parts[0].text;
             addMsg(aiText, 'gto');
             speak(aiText);
             document.getElementById('status-text').textContent = "Hold to speak";
         } catch (e) {
+            console.error(e);
             addMsg("API Error. Check your key!", 'gto');
+            document.getElementById('status-text').textContent = "Hold to speak";
         }
     }
 </script>
