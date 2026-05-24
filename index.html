@@ -160,7 +160,7 @@
         if(userText.toLowerCase().includes("i think")) document.getElementById('m1').className = 'mission-item done';
         if(userText.toLowerCase().includes("because")) document.getElementById('m2').className = 'mission-item done';
 
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+      const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
         
         // 学年とレベルに応じたシステムプロンプトの構築
         const systemPrompt = `
