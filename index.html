@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>GTO AI English Coach - New Crown Full Version</title>
+    <title>オガちゃん Speaking</title>
     <style>
         :root { --primary: #002147; --accent: #ffd700; --easy: #4caf50; --normal: #2196f3; --hard: #f44336; }
         body { font-family: 'Segoe UI', 'Noto Sans JP', sans-serif; background: #f1f5f9; margin: 0; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
@@ -50,7 +50,7 @@
 <body>
 
 <div class="screen active" id="screen-grade">
-    <h1>Grade Select</h1>
+    <h1>オガちゃん Speaking</h1>
     <p class="desc">学年を選んでください (Select your grade)</p>
     <div class="grid">
         <div class="card" onclick="selectGrade(1)"><h2>JHS 1</h2><p>中学1年<br>基礎・基本</p></div>
@@ -95,7 +95,7 @@
     let level = 'Normal';
     let isListening = false;
 
-    // ★ NEW CROWN 1年〜3年 全カリキュラムデータ（添付資料より完全抽出）
+    // ★ NEW CROWN 1年〜3年 全カリキュラムデータ
     const newCrownData = {
         1: [
             { lesson: "Lesson 1", title: "About Me", grammar: "be動詞と一般動詞の現在形(1・2人称)、What do you...?" },
@@ -165,8 +165,8 @@
         badge.textContent = `JHS ${grade} - ${lessonShort} - ${level} Mode`;
         badge.style.backgroundColor = `var(--${level.toLowerCase()})`;
         
-        // 初回メッセージも英語と日本語を「|」で区切って設定
-        const introText = `Hi! I'm GTO, your English coach. Let's talk using ${lessonShort}! Ready?|こんにちは！GTOです。${lessonShort}の内容を使ってお話ししましょう！準備はいいですか？`;
+        // 初回メッセージ（オガちゃんとして挨拶するように変更）
+        const introText = `Hi! I'm Oga-chan. Let's practice English using ${lessonShort}! Ready?|こんにちは！オガちゃんです。${lessonShort}を使って英語の練習をしよう！準備はいい？`;
         processGtoMsg(introText);
     }
 
@@ -249,4 +249,50 @@
         if(userText.toLowerCase().includes("i think")) document.getElementById('m1').className = 'mission-item done';
         if(userText.toLowerCase().includes("because")) document.getElementById('m2').className = 'mission-item done';
 
-        const url = `
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+        
+        const systemPrompt = `
+            You are Oga-chan, a friendly and supportive English teacher for Japanese students.
+            User is a Japanese Junior High School Grade ${grade} student.
+            Target Textbook: "NEW CROWN" (Sanseido).
+            Current Lesson & Grammar Constraint: ${lesson}
+            Current Difficulty Level: ${level}.
+            
+            CRITICAL INSTRUCTIONS:
+            1. Restrict your grammar and vocabulary strictly to what is learned up to this point in the "NEW CROWN" textbook for Grade ${grade}. Do not use unlearned advanced grammar.
+            2. Keep your English response extremely short (1 to 2 simple sentences MAXIMUM). Never output long sentences or paragraphs.
+            3. Format your response STRICTLY as "English text|Japanese translation". Do not include any other text, markdown, or extra symbols.
+               Example: "Great job! What do you like?|よくできました！何が好きですか？"
+            4. ${level === 'Easy' ? "Use very simple words. Provide hints like 'You can say: I think...'" : level === 'Hard' ? "Use natural speed. Ask 'Why?' or 'How?' to challenge the student." : "Speak politely and clearly."}
+            
+            Student said: "${userText}"
+        `;
+
+        try {
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] }) 
+            });
+            
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error("API Error Details:", data);
+                processGtoMsg(`通信エラーが発生しました。|API Error: ${data.error?.message || 'Check your key or connection.'}`);
+                document.getElementById('status-text').textContent = "Hold to speak";
+                return;
+            }
+
+            const aiText = data.candidates[0].content.parts[0].text;
+            processGtoMsg(aiText);
+            document.getElementById('status-text').textContent = "Hold to speak";
+        } catch (e) {
+            console.error(e);
+            processGtoMsg("エラーが発生しました。|System Error occurred.");
+            document.getElementById('status-text').textContent = "Hold to speak";
+        }
+    }
+</script>
+</body>
+</html>
