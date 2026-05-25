@@ -2,61 +2,131 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>オガちゃん Speaking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Afacad+Flux:wght@400;500;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
-        :root { --primary: #002147; --accent: #ffd700; --easy: #4caf50; --normal: #2196f3; --hard: #f44336; }
-        body { font-family: 'Segoe UI', 'Noto Sans JP', sans-serif; background: #f1f5f9; margin: 0; display: flex; justify-content: center; height: 100vh; overflow: hidden; }
+        :root {
+            /* ポップなカラーパレット */
+            --pop-lime: #dcfd8b;
+            --pop-peach: #fdd5bd;
+            --pop-purple: #bc84ee;
+            --pop-orange: #ff823a;
+            --pop-mint: #a8f0d1;
+            --text-dark: #1e293b;
+            --bg-light: #f8fafc;
+            
+            /* 難易度カラーの割り当て */
+            --easy: var(--pop-mint);
+            --normal: var(--pop-purple);
+            --hard: var(--pop-orange);
+        }
+
+        body { 
+            font-family: 'Afacad Flux', 'Noto Sans JP', sans-serif; 
+            background-color: var(--bg-light); 
+            margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; 
+            position: relative;
+            color: var(--text-dark);
+        }
+
+        /* 浮遊する背景デザイン */
+        body::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 10% 20%, rgba(220, 253, 139, 0.5) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(188, 132, 238, 0.3) 0%, transparent 40%);
+            z-index: -2;
+        }
+        .bg-shape1 { position: absolute; width: 250px; height: 250px; top: -50px; right: -50px; background: var(--pop-peach); border-radius: 50%; opacity: 0.5; z-index: -1; }
+        .bg-shape2 { position: absolute; width: 200px; height: 200px; bottom: 50px; left: 50px; background: var(--pop-mint); border-radius: 50%; opacity: 0.5; z-index: -1; }
         
-        /* 画面切り替え管理 */
-        .screen { display: none; width: 100%; max-width: 800px; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; animation: fadeIn 0.5s; box-sizing: border-box; max-height: 100vh; overflow-y: auto; }
+        /* 画面切り替え管理（半透明のガラス風コンテナ） */
+        .screen { 
+            display: none; width: 95%; max-width: 800px; flex-direction: column; align-items: center; justify-content: flex-start; 
+            padding: 30px; animation: fadeIn 0.5s; box-sizing: border-box; max-height: 95vh; overflow-y: auto; 
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px);
+            border: 4px solid #fff; border-radius: 35px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05); z-index: 1;
+        }
         .screen.active { display: flex; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* タイトル・テキスト周り */
-        .title-area { margin-top: 10px; margin-bottom: 20px; text-align: center; width: 100%; }
-        h1 { color: var(--primary); font-size: 2.3rem; margin: 0 0 5px 0; }
-        .desc { color: #64748b; margin: 0; }
+        .title-area { margin-top: 10px; margin-bottom: 25px; text-align: center; width: 100%; }
+        h1, h2 { font-family: 'Comfortaa', 'Noto Sans JP', cursive; color: var(--text-dark); margin: 0; }
+        h1 { font-size: 2.8rem; margin-bottom: 5px; font-weight: 700; }
+        .desc { font-size: 1.1rem; color: #64748b; margin: 0; font-weight: 500; }
 
         /* 戻るボタン */
-        .back-btn { align-self: flex-start; background: transparent; border: 2px solid #cbd5e1; border-radius: 8px; color: var(--primary); font-size: 0.9rem; font-weight: bold; cursor: pointer; padding: 6px 12px; margin-bottom: 10px; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
-        .back-btn:hover { background: #e2e8f0; border-color: #94a3b8; }
+        .back-btn { 
+            align-self: flex-start; background: #fff; border: 3px solid var(--pop-peach); border-radius: 15px; 
+            color: var(--text-dark); font-family: 'Comfortaa', sans-serif; font-size: 1rem; font-weight: 700; 
+            cursor: pointer; padding: 8px 16px; margin-bottom: 15px; transition: 0.2s; display: flex; align-items: center; gap: 8px; 
+        }
+        .back-btn:hover { background: var(--pop-peach); transform: translateX(-3px); }
 
-        /* セレクター */
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; width: 100%; padding: 10px 0; }
-        .card { background: white; border: 3px solid #ddd; border-radius: 15px; padding: 18px; text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .card:hover { transform: scale(1.03); border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .card h2 { margin: 0; font-size: 1.3rem; color: var(--primary); }
-        .card p { margin: 8px 0 0 0; font-size: 0.9rem; color: #475569; line-height: 1.3; }
+        /* セレクター（カラフルカード） */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 100%; padding: 10px 0; }
+        .card { 
+            background: #fff; border: 4px solid #ddd; border-radius: 25px; padding: 25px 20px; 
+            text-align: center; cursor: pointer; transition: 0.3s; box-shadow: 0 8px 15px rgba(0,0,0,0.03); 
+        }
+        .card:hover { transform: translateY(-5px) scale(1.02); box-shadow: 0 15px 25px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 1.6rem; color: var(--text-dark); }
+        .card p { margin: 10px 0 0 0; font-size: 1rem; color: #475569; font-weight: 500; line-height: 1.4; }
 
         /* チャット画面 */
-        #chat-window { flex: 1; width: 100%; background: white; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); margin-bottom: 20px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; min-height: 200px; }
-        .msg { padding: 12px 18px; border-radius: 15px; max-width: 85%; font-size: 1.1rem; line-height: 1.4; box-sizing: border-box; }
-        .gto-msg { background: #e8eaf6; color: var(--primary); align-self: flex-start; }
-        .user-msg { background: var(--primary); color: white; align-self: flex-end; }
+        #chat-window { 
+            flex: 1; width: 100%; background: #fff; border: 4px solid var(--pop-lime); border-radius: 25px; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.03); margin-bottom: 20px; overflow-y: auto; padding: 25px; 
+            display: flex; flex-direction: column; gap: 15px; box-sizing: border-box; min-height: 300px; 
+        }
+        .msg { padding: 15px 20px; border-radius: 25px; max-width: 85%; font-size: 1.15rem; line-height: 1.4; box-sizing: border-box; font-weight: 500; }
+        .gto-msg { background: var(--pop-lime); color: var(--text-dark); align-self: flex-start; border-bottom-left-radius: 5px; }
+        .user-msg { background: var(--pop-purple); color: #fff; align-self: flex-end; border-bottom-right-radius: 5px; }
 
         /* 3段階表示ギミック用のボタン */
-        .toggle-btn { background: white; border: 2px solid #cbd5e1; padding: 8px 15px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; color: var(--primary); transition: 0.2s; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px; }
-        .toggle-btn:hover { background: #f8fafc; border-color: #94a3b8; }
-        
-        /* もう一度聞くボタン（見やすい水色） */
-        .toggle-btn.repeat-btn { background: #e0f2fe; border-color: #bae6fd; color: #0369a1; }
-        .toggle-btn.repeat-btn:hover { background: #bae6fd; }
+        .toggle-btn { 
+            background: #fff; border: 3px solid var(--pop-peach); padding: 8px 16px; border-radius: 15px; 
+            font-size: 0.95rem; cursor: pointer; color: var(--text-dark); transition: 0.2s; font-weight: 700; 
+            display: flex; align-items: center; justify-content: center; gap: 6px; font-family: 'Afacad Flux', 'Noto Sans JP', sans-serif;
+        }
+        .toggle-btn:hover { background: var(--pop-peach); }
+        .toggle-btn.repeat-btn { border-color: var(--pop-mint); }
+        .toggle-btn.repeat-btn:hover { background: var(--pop-mint); }
+        .toggle-btn.view-ja-btn { border-width: 2px; font-size: 0.85rem; padding: 6px 12px; margin-top: 10px; border-color: #cbd5e1; }
 
         /* ミッションパネル */
-        .mission-panel { width: 100%; display: flex; justify-content: space-around; margin-bottom: 10px; background: #fff; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .mission-item { color: #ccc; }
-        .mission-item.done { color: var(--easy); }
+        .mission-panel { 
+            width: 100%; display: flex; justify-content: space-around; margin-bottom: 15px; background: #fff; 
+            padding: 12px; border: 3px solid var(--pop-peach); border-radius: 20px; font-weight: 700; font-size: 1rem; color: #94a3b8; 
+        }
+        .mission-item.done { color: var(--pop-orange); }
 
-        /* 操作パネル */
-        .controls { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 15px 0; background: white; border-radius: 20px 20px 0 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); flex-shrink: 0; }
-        #talk-btn { width: 90px; height: 90px; border-radius: 50%; border: 6px solid #ddd; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.2s; user-select: none; }
-        #talk-btn.active { background: var(--hard); color: white; border-color: #ff8a80; transform: scale(0.95); box-shadow: 0 0 20px rgba(244,67,54,0.4); }
-        #status-text { margin-top: 10px; font-weight: bold; color: var(--primary); }
+        /* 操作パネル（マイクボタン） */
+        .controls { width: 100%; display: flex; flex-direction: column; align-items: center; padding: 10px 0; flex-shrink: 0; }
+        #talk-btn { 
+            width: 100px; height: 100px; border-radius: 50%; border: 6px solid var(--pop-orange); background: #fff; 
+            color: var(--pop-orange); cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            font-family: 'Comfortaa', sans-serif; font-size: 1.3rem; font-weight: 700; transition: 0.2s; user-select: none; 
+            box-shadow: 0 10px 20px rgba(255, 130, 58, 0.2); 
+        }
+        #talk-btn.active { background: var(--pop-orange); color: white; transform: scale(0.95); box-shadow: 0 0 25px rgba(255, 130, 58, 0.6); }
+        #status-text { margin-top: 15px; font-weight: 700; font-family: 'Comfortaa', 'Noto Sans JP', sans-serif; color: var(--text-dark); font-size: 1.1rem; }
 
-        .difficulty-indicator { padding: 5px 15px; border-radius: 20px; color: white; font-size: 0.8rem; margin-bottom: 10px; font-weight: bold; align-self: center; }
+        .difficulty-indicator { 
+            padding: 8px 25px; border-radius: 25px; color: #fff; font-family: 'Comfortaa', sans-serif; 
+            font-size: 1rem; margin-bottom: 15px; font-weight: 700; align-self: center; box-shadow: 0 5px 10px rgba(0,0,0,0.1); 
+        }
     </style>
 </head>
 <body>
+
+<div class="bg-shape1"></div>
+<div class="bg-shape2"></div>
 
 <div class="screen active" id="screen-grade">
     <div class="title-area">
@@ -64,14 +134,14 @@
         <p class="desc">学年を選んでください (Select your grade)</p>
     </div>
     <div class="grid">
-        <div class="card" onclick="selectGrade(1)"><h2>JHS 1</h2><p>中学1年<br>基礎・基本</p></div>
-        <div class="card" onclick="selectGrade(2)"><h2>JHS 2</h2><p>中学2年<br>表現・理由</p></div>
-        <div class="card" onclick="selectGrade(3)"><h2>JHS 3</h2><p>中学3年<br>実践・流暢性</p></div>
+        <div class="card" onclick="selectGrade(1)" style="border-color: var(--pop-mint)"><h2>JHS 1</h2><p>中学1年</p></div>
+        <div class="card" onclick="selectGrade(2)" style="border-color: var(--pop-peach)"><h2>JHS 2</h2><p>中学2年</p></div>
+        <div class="card" onclick="selectGrade(3)" style="border-color: var(--pop-purple)"><h2>JHS 3</h2><p>中学3年</p></div>
     </div>
 </div>
 
 <div class="screen" id="screen-lesson">
-    <button class="back-btn" onclick="goBack('screen-lesson', 'screen-grade')">◀ Back</button>
+    <button class="back-btn" onclick="goBack('screen-lesson', 'screen-grade')"><i class="fa-solid fa-arrow-left"></i> Back</button>
     <div class="title-area">
         <h1>Lesson Select</h1>
         <p class="desc">学習する範囲を選んでください (Select your lesson)</p>
@@ -80,44 +150,45 @@
 </div>
 
 <div class="screen" id="screen-level">
-    <button class="back-btn" onclick="goBack('screen-level', 'screen-lesson')">◀ Back</button>
+    <button class="back-btn" onclick="goBack('screen-level', 'screen-lesson')"><i class="fa-solid fa-arrow-left"></i> Back</button>
     <div class="title-area">
         <h1>Difficulty Select</h1>
         <p class="desc">難易度を選んでください (Select difficulty)</p>
     </div>
     <div class="grid">
-        <div class="card" onclick="selectLevel('Easy')" style="border-color: var(--easy)"><h2>Easy</h2><p>ゆっくり・ヒントあり</p></div>
-        <div class="card" onclick="selectLevel('Normal')" style="border-color: var(--normal)"><h2>Normal</h2><p>ふつうのスピード</p></div>
-        <div class="card" onclick="selectLevel('Hard')" style="border-color: var(--hard)"><h2>Hard</h2><p>速い・深掘り質問</p></div>
+        <div class="card" onclick="selectLevel('Easy')" style="border-color: var(--pop-mint)"><h2>Easy</h2><p>ゆっくり・ヒントあり</p></div>
+        <div class="card" onclick="selectLevel('Normal')" style="border-color: var(--pop-purple)"><h2>Normal</h2><p>ふつうのスピード</p></div>
+        <div class="card" onclick="selectLevel('Hard')" style="border-color: var(--pop-orange)"><h2>Hard</h2><p>速い・深掘り質問</p></div>
     </div>
 </div>
 
 <div class="screen" id="screen-chat">
-    <button class="back-btn" onclick="goBack('screen-chat', 'screen-level')">◀ Back</button>
+    <button class="back-btn" onclick="goBack('screen-chat', 'screen-level')"><i class="fa-solid fa-arrow-left"></i> Back</button>
     <div id="grade-badge" class="difficulty-indicator"></div>
     <div class="mission-panel">
-        <div id="m1" class="mission-item">□ I think...</div>
-        <div id="m2" class="mission-item">□ because...</div>
+        <div id="m1" class="mission-item"><i class="fa-regular fa-square-check"></i> I think...</div>
+        <div id="m2" class="mission-item"><i class="fa-regular fa-square-check"></i> because...</div>
     </div>
     <div id="chat-window"></div>
     <div class="controls">
         <div id="status-text">Hold to speak</div>
-        <div id="talk-btn">TALK</div>
+        <div id="talk-btn"><i class="fa-solid fa-microphone" style="margin-right: 5px;"></i> TALK</div>
     </div>
 </div>
 
 <script>
     // ★ ここをご自身の「分割したキー」に書き換えてください！
     const keyPart1 = "AIzaSyCKfsgCsCZGW";
-　  const keyPart2 = "tRxe13p4nlmnfc82_VDE2Y";
-  　const API_KEY = keyPart1 + keyPart2;
+　const keyPart2 = "tRxe13p4nlmnfc82_VDE2Y";
+　const API_KEY = keyPart1 + keyPart2;
+
 
     let grade = 1;
     let lesson = '';
     let level = 'Normal';
     let isListening = false;
 
-    // ★ 1年・2年・3年の全カリキュラムを指示通りに完全修正しました！
+    // 1年・2年・3年のカリキュラム
     const newCrownData = {
         1: [
             { lesson: "Lesson 1", title: "自己紹介", grammar: "1・2人称のbe動詞、一般動詞、what、自己紹介、How many ~" },
@@ -152,7 +223,6 @@
         ]
     };
 
-    // 戻るボタンの処理
     function goBack(currentScreenId, prevScreenId) {
         window.speechSynthesis.cancel();
         document.getElementById(currentScreenId).classList.remove('active');
@@ -165,18 +235,24 @@
         }
     }
 
-    // 画面遷移・選択ロジック
     function selectGrade(g) { 
         grade = g; 
         const lessonGrid = document.getElementById('lesson-grid');
         lessonGrid.innerHTML = ''; 
         
+        // カードの枠線をカラフルに順番に割り当てる
+        const colors = ['var(--pop-peach)', 'var(--pop-lime)', 'var(--pop-purple)', 'var(--pop-mint)'];
+        let colorIndex = 0;
+
         newCrownData[grade].forEach(item => {
             const card = document.createElement('div');
             card.className = 'card';
+            card.style.borderColor = colors[colorIndex % colors.length];
+            colorIndex++;
+
             const aiInstruction = `${item.lesson}: ${item.title} (${item.grammar})`;
             card.onclick = () => selectLesson(aiInstruction);
-            card.innerHTML = `<h2>${item.lesson}</h2><p><strong>${item.title}</strong><br><small style="color:#64748b; font-size:11px;">${item.grammar}</small></p>`;
+            card.innerHTML = `<h2>${item.lesson}</h2><p><strong>${item.title}</strong><br><small style="color:#64748b; font-size:12px;">${item.grammar}</small></p>`;
             lessonGrid.appendChild(card);
         });
 
@@ -200,14 +276,13 @@
     function setupApp() {
         const badge = document.getElementById('grade-badge');
         const lessonShort = lesson.split('(')[0].trim(); 
-        badge.textContent = `JHS ${grade} - ${lessonShort} - ${level} Mode`;
+        badge.textContent = `JHS ${grade} - ${lessonShort} - ${level}`;
         badge.style.backgroundColor = `var(--${level.toLowerCase()})`;
         
-        const introText = `Hi! I'm Oga-chan. Let's practice English using ${lessonShort}! Ready?|こんにちは！オガちゃんです。${lessonShort}を使って英語の練習をしよう！準備はいい？`;
+        const introText = `Hi! I'm Oga-chan. Let's practice English. Ready?|こんにちは！オガちゃんです。英語の練習をしよう！準備はいい？`;
         processGtoMsg(introText);
     }
 
-    // 音声認識・合成の設定
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
@@ -222,7 +297,6 @@
         win.scrollTop = win.scrollHeight;
     }
 
-    // ★ AIの返答を「音声のみ → 英文 → 日本語」の3段階で表示 ＋「もう一度聞く」ボタン
     function processGtoMsg(text) {
         const parts = text.split('|');
         const enText = parts[0] ? parts[0].trim() : "Sorry, I couldn't understand.";
@@ -231,21 +305,19 @@
         const div = document.createElement('div');
         div.className = `msg gto-msg`;
         
-        // ボタンを横並びにする構成
         div.innerHTML = `
             <div style="display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;">
-                <button class="toggle-btn repeat-btn">🔊 もう一度聞く</button>
-                <button class="toggle-btn view-en-btn">👀 英文を見る</button>
+                <button class="toggle-btn repeat-btn"><i class="fa-solid fa-volume-high"></i> もう一度聞く</button>
+                <button class="toggle-btn view-en-btn"><i class="fa-solid fa-eye"></i> 英文を見る</button>
             </div>
-            <div class="en-text" style="display:none; font-size:1.1rem; margin-bottom:10px; font-weight: 500;"></div>
+            <div class="en-text" style="display:none; font-size:1.2rem; margin-bottom:10px; font-weight: 700; color: var(--text-dark);"></div>
             
-            <button class="toggle-btn view-ja-btn" style="display:none; font-size:0.8rem; padding:4px 10px; margin-top: 5px;">
-                🇯🇵 日本語訳を見る
+            <button class="toggle-btn view-ja-btn" style="display:none;">
+                <i class="fa-solid fa-language"></i> 日本語訳を見る
             </button>
-            <div class="ja-text" style="display:none; color:#475569; font-size:0.95rem; border-top:1px dashed #cbd5e1; padding-top:8px; margin-top: 5px;"></div>
+            <div class="ja-text" style="display:none; color:#64748b; font-size:0.95rem; border-top:2px dashed var(--pop-peach); padding-top:10px; margin-top: 10px;"></div>
         `;
 
-        // 特殊文字対策として、テキストはtextContentで安全に代入
         div.querySelector('.en-text').textContent = enText;
         div.querySelector('.ja-text').textContent = jaText;
 
@@ -255,20 +327,17 @@
         const enDiv = div.querySelector('.en-text');
         const jaDiv = div.querySelector('.ja-text');
 
-        // もう一度聞くボタンのクリックイベント
         repeatBtn.onclick = () => {
-            window.speechSynthesis.cancel(); // 再生中の音声を止めてから再生
+            window.speechSynthesis.cancel();
             speak(enText);
         };
 
-        // 英文を見るボタンのクリックイベント
         viewEnBtn.onclick = () => {
             viewEnBtn.style.display = 'none';
             enDiv.style.display = 'block';
             viewJaBtn.style.display = 'block';
         };
 
-        // 日本語訳を見るボタンのクリックイベント
         viewJaBtn.onclick = () => {
             viewJaBtn.style.display = 'none';
             jaDiv.style.display = 'block';
@@ -278,7 +347,6 @@
         win.appendChild(div);
         win.scrollTop = win.scrollHeight;
 
-        // 音声は自動で即時読み上げる
         speak(enText);
     }
 
@@ -294,14 +362,14 @@
         window.speechSynthesis.cancel();
         isListening = true;
         btn.classList.add('active');
-        document.getElementById('status-text').textContent = "🎙️ LISTENING...";
+        document.getElementById('status-text').innerHTML = "<i class='fa-solid fa-ear-listen'></i> LISTENING...";
         try { recognition.start(); } catch(e) {}
     };
 
     const stopRec = () => {
         isListening = false;
         btn.classList.remove('active');
-        document.getElementById('status-text').textContent = "⌛ Processing...";
+        document.getElementById('status-text').textContent = "Hold to speak";
         recognition.stop();
     };
     btn.onmouseup = stopRec;
@@ -310,10 +378,10 @@
     recognition.onresult = (event) => {
         const text = event.results[0][0].transcript;
         addUserMsg(text);
+        document.getElementById('status-text').innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> Processing...";
         sendToGemini(text);
     };
 
-    // Gemini API 連携
     async function sendToGemini(userText) {
         if(userText.toLowerCase().includes("i think")) document.getElementById('m1').className = 'mission-item done';
         if(userText.toLowerCase().includes("because")) document.getElementById('m2').className = 'mission-item done';
