@@ -218,7 +218,7 @@
         else if(level === 'Normal') badge.style.backgroundColor = "var(--normal)";
         else badge.style.backgroundColor = "var(--hard)";
         
-        const introText = "Hi! I'm Oga-chan. Let's practice English. Ready?|こんにちは！オガちゃんです。英語の練習をしよう！準備はいい？";
+        const introText = "Hi! I'm Oga-chan. Let's practice English. What anime do you like?|こんにちは！オガちゃんです。英語の練習をしよう！どんなアニメが好き？";
         processGtoMsg(introText);
     }
 
@@ -393,7 +393,7 @@
             btn.classList.add('active');
             btn.textContent = "STOP";
             btn.style.borderColor = "var(--pop-purple)";
-            btn.style.color = "var(--pop-purple)";
+            btn.style.color = "var(--purple)";
             document.getElementById('status-text').innerHTML = "<i class='fa-solid fa-ear-listen'></i> 録音中... [話し終えたらもう一度押す]";
             try { recognition.start(); } catch(err) {}
         } else {
@@ -417,16 +417,22 @@
 
         const url = "https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=" + FULL_API_KEY;
 
-        const systemPrompt = "You are Oga-chan, a friendly and supportive English teacher for Japanese students.\n" +
+        const systemPrompt = "You are Oga-chan, a friendly and supportive English teacher for Japanese junior high school students.\n" +
           "User is a Japanese Junior High School Grade " + grade + " student.\n" +
           "Target Textbook: \"NEW CROWN\" (Sanseido).\n" +
           "Current Lesson & Grammar Constraint: " + lesson + "\n" +
           "Current Difficulty Level: " + level + ".\n\n" +
-          "CRITICAL INSTRUCTIONS:\n" +
-          "1. Restrict your grammar and vocabulary strictly to what is learned up to this point in the \"NEW CROWN\" textbook for Grade " + grade + ". Do not use unlearned advanced grammar.\n" +
-          "2. Keep your English response extremely short (1 to 2 simple sentences MAXIMUM). Never output long sentences or paragraphs.\n" +
-          "3. Format your response STRICTLY as \"English text|Japanese translation\". Do not include any other text, markdown, or extra symbols.\n" +
-          "4. " + (level === 'Easy' ? "Use very simple words. Provide hints like 'You can say: I think...'" : level === 'Hard' ? "Use natural speed. Ask 'Why?' or 'How?' to challenge the student." : "Speak politely and clearly.") + "\n\n" +
+          "CRITICAL INTERACTION RULES:\n" +
+          "1. RESPONSE FORMAT: You must strictly output ONLY \"English text|Japanese translation\". Do not include any other text, markdown, or symbols.\n" +
+          "2. MANDATORY QUESTIONING: Every response you make MUST end with a clear, easy question to keep the conversation going. Never end with a statement.\n" +
+          "3. SCENARIO - FRAGMENTED/POOR INPUT: If the student inputs only a single word, fragmented English, or bad grammar (e.g., \"Soccer\", \"I like play\"), you must:\n" +
+          "   - Acknowledge and guess their meaning kindly (e.g., \"Oh, you like soccer!\" or \"Do you mean you like playing soccer?\").\n" +
+          "   - Provide the correct target sentence and prompt them to repeat it (e.g., \"Please repeat: I like playing soccer.\").\n" +
+          "   - Immediately follow up with a related question to continue the flow.\n" +
+          "4. GRAMMAR CONSTRAINT: Restrict your language to grammar learned up to Grade " + grade + " in NEW CROWN. Keep responses to 1-2 short sentences.\n" +
+          "5. LEVEL ADJUSTMENT: \n" +
+          "   - Easy: Use very simple words, provide explicit hints.\n" +
+          "   - Hard: Challenge them with \"Why?\" or \"How?\".\n\n" +
           "Student said: \"" + userText + "\"";
 
         const payload = {
