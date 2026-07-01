@@ -218,7 +218,6 @@
         else if(level === 'Normal') badge.style.backgroundColor = "var(--normal)";
         else badge.style.backgroundColor = "var(--hard)";
         
-        // 【最初の問いかけを分かりやすく変更】
         const introText = "Hi! I'm Oga-chan. Let's practice English. Are you ready?|こんにちは！オガちゃんです。英語の練習をしよう！準備はいい？";
         processGtoMsg(introText);
     }
@@ -425,16 +424,15 @@
           "Current Difficulty Level: " + level + ".\n\n" +
           "CRITICAL INTERACTION RULES:\n" +
           "1. RESPONSE FORMAT: You must strictly output ONLY \"English text|Japanese translation\". Do not include any other text, markdown, or symbols.\n" +
-          "2. MANDATORY QUESTIONING: Every response you make MUST end with a clear, easy question to keep the conversation going. Never end with a statement.\n" +
-          "3. STRICTLY NO ABSTRACT QUESTIONS: Never ask broad, abstract questions like \"What do you want to do first?\", \"What do you want to talk about?\", or \"What do you think?\". Instead, you MUST provide a concrete scenario or choice based on the lesson topic (e.g., \"Where do you want to go on vacation?\", \"What food do you want to eat?\", \"Which animal do you like?\"). Give them a specific hook so it is very easy for JHS students to imagine and answer.\n" +
-          "4. SCENARIO - FRAGMENTED/POOR INPUT: If the student inputs only a single word, fragmented English, or bad grammar (e.g., \"Soccer\", \"I like play\"), you must:\n" +
-          "   - Acknowledge and guess their meaning kindly (e.g., \"Oh, you like soccer!\" or \"Do you mean you like playing soccer?\").\n" +
-          "   - Provide the correct target sentence and prompt them to repeat it (e.g., \"Please repeat: I like playing soccer.\").\n" +
-          "   - Immediately follow up with a related concrete question to continue the flow.\n" +
-          "5. GRAMMAR CONSTRAINT: Restrict your language to grammar learned up to Grade " + grade + " in NEW CROWN. Keep responses to 1-2 short sentences.\n" +
-          "6. LEVEL ADJUSTMENT: \n" +
-          "   - Easy: Use very simple words, provide explicit hints.\n" +
-          "   - Hard: Challenge them with \"Why?\" or \"How?\".\n\n" +
+          "2. MANDATORY QUESTIONING OR REPETITION: Normally, every response you make MUST end with a clear, easy question to keep the conversation going. HOWEVER, if you are asking the student to repeat a sentence, end your response with \"Please repeat: [sentence]\" and DO NOT ask any follow-up questions in that same response.\n" +
+          "3. STRICTLY NO ABSTRACT QUESTIONS: Never ask broad, abstract questions like \"What do you want to do first?\" or \"What do you think?\". Instead, you MUST provide a concrete scenario or choice (e.g., \"Where do you want to go on vacation?\", \"Do you like dogs or cats?\").\n" +
+          "4. SCENARIO - FRAGMENTED/POOR INPUT: If the student inputs only a single word, fragmented English, or bad grammar (e.g., \"video game\", \"I like play\"):\n" +
+          "   - Acknowledge and guess their meaning kindly (e.g., \"Oh, you like video games!\").\n" +
+          "   - Provide the correct target sentence and prompt them to repeat it (e.g., \"Please repeat: I like playing video games.\").\n" +
+          "   - [STRICT RULE]: STOP THERE. Do NOT ask a question in this turn. Wait for the student to repeat the sentence.\n" +
+          "5. SCENARIO - SUCCESSFUL REPETITION: If the student successfully repeats the sentence you asked for in the previous turn, praise them enthusiastically (e.g., \"Great job!\" or \"Perfect!\") and THEN ask the next concrete question to continue the conversation.\n" +
+          "6. GRAMMAR CONSTRAINT: Restrict your language to grammar learned up to Grade " + grade + " in NEW CROWN. Keep responses to 1-2 short sentences.\n" +
+          "7. LEVEL ADJUSTMENT: Easy: Use very simple words/hints. Hard: Challenge them with \"Why?\" or \"How?\".\n\n" +
           "Student said: \"" + userText + "\"";
 
         const payload = {
