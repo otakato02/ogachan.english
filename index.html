@@ -218,7 +218,8 @@
         else if(level === 'Normal') badge.style.backgroundColor = "var(--normal)";
         else badge.style.backgroundColor = "var(--hard)";
         
-        const introText = "Hi! I'm Oga-chan. Let's practice English. What anime do you like?|こんにちは！オガちゃんです。英語の練習をしよう！どんなアニメが好き？";
+        // 【最初の問いかけを分かりやすく変更】
+        const introText = "Hi! I'm Oga-chan. Let's practice English. Are you ready?|こんにちは！オガちゃんです。英語の練習をしよう！準備はいい？";
         processGtoMsg(introText);
     }
 
@@ -393,7 +394,7 @@
             btn.classList.add('active');
             btn.textContent = "STOP";
             btn.style.borderColor = "var(--pop-purple)";
-            btn.style.color = "var(--purple)";
+            btn.style.color = "var(--pop-purple)";
             document.getElementById('status-text').innerHTML = "<i class='fa-solid fa-ear-listen'></i> 録音中... [話し終えたらもう一度押す]";
             try { recognition.start(); } catch(err) {}
         } else {
@@ -425,12 +426,13 @@
           "CRITICAL INTERACTION RULES:\n" +
           "1. RESPONSE FORMAT: You must strictly output ONLY \"English text|Japanese translation\". Do not include any other text, markdown, or symbols.\n" +
           "2. MANDATORY QUESTIONING: Every response you make MUST end with a clear, easy question to keep the conversation going. Never end with a statement.\n" +
-          "3. SCENARIO - FRAGMENTED/POOR INPUT: If the student inputs only a single word, fragmented English, or bad grammar (e.g., \"Soccer\", \"I like play\"), you must:\n" +
+          "3. STRICTLY NO ABSTRACT QUESTIONS: Never ask broad, abstract questions like \"What do you want to do first?\", \"What do you want to talk about?\", or \"What do you think?\". Instead, you MUST provide a concrete scenario or choice based on the lesson topic (e.g., \"Where do you want to go on vacation?\", \"What food do you want to eat?\", \"Which animal do you like?\"). Give them a specific hook so it is very easy for JHS students to imagine and answer.\n" +
+          "4. SCENARIO - FRAGMENTED/POOR INPUT: If the student inputs only a single word, fragmented English, or bad grammar (e.g., \"Soccer\", \"I like play\"), you must:\n" +
           "   - Acknowledge and guess their meaning kindly (e.g., \"Oh, you like soccer!\" or \"Do you mean you like playing soccer?\").\n" +
           "   - Provide the correct target sentence and prompt them to repeat it (e.g., \"Please repeat: I like playing soccer.\").\n" +
-          "   - Immediately follow up with a related question to continue the flow.\n" +
-          "4. GRAMMAR CONSTRAINT: Restrict your language to grammar learned up to Grade " + grade + " in NEW CROWN. Keep responses to 1-2 short sentences.\n" +
-          "5. LEVEL ADJUSTMENT: \n" +
+          "   - Immediately follow up with a related concrete question to continue the flow.\n" +
+          "5. GRAMMAR CONSTRAINT: Restrict your language to grammar learned up to Grade " + grade + " in NEW CROWN. Keep responses to 1-2 short sentences.\n" +
+          "6. LEVEL ADJUSTMENT: \n" +
           "   - Easy: Use very simple words, provide explicit hints.\n" +
           "   - Hard: Challenge them with \"Why?\" or \"How?\".\n\n" +
           "Student said: \"" + userText + "\"";
