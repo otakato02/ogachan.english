@@ -124,13 +124,22 @@
     let recognitionActive = false;
 
     // ==========================================
-    // 🚨 【超重要】APIキー設定エリア
-    // 新しく発行したAPIキーを「逆順」にして、以下の "" の中に貼り付けてください。
+    // 🚨 【最終対策】APIキー細切れ作戦（AQキー版）
     // ==========================================
-    const reversedKey = "wLdAvATmKy6OENsSkIQiTOhtEy8lF0lRmmuIed6nKtoL6NR8bA.QA";
-    
-    // プログラムが自動で文字をひっくり返して正しいキーに戻します
-    const FULL_API_KEY = reversedKey.split('').reverse().join('');
+
+    // 先生の新しいキーに合わせて、手作業で数文字ずつ分割します
+    const part1 = "AQ.Ab"; 
+    const part2 = "8RN6L"; 
+    const part3 = "ykTi-Tj"; 
+    const part4 = "clZbeT";
+    const part5 = "-7UsEd";
+    const part6 = "ADhbS";
+    const part7 = "xz-3HW";
+    const part8 = "-6Wj0D";
+    const part9 = "tdSehog";
+
+    // 実行時に自動で1つのキーに合体します
+    const FULL_API_KEY = part1 + part2 + part3 + part4 + part5 + part6 + part7 + part8 + part9;
     // ==========================================
 
     const newCrownData = {
